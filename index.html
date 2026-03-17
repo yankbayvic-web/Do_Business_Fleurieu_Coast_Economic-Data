@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yankalilla LGA — Economic Dashboard | Do Business Fleurieu Coast</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --cyan: #00BCD4;
+    --cyan-dark: #0097A7;
+    --cyan-light: #E0F7FA;
+    --cyan-mid: #4DD0E1;
+    --black: #1A1A1A;
+    --white: #FFFFFF;
+    --grey-light: #F4F4F4;
+    --grey-mid: #E0E0E0;
+    --grey-text: #666666;
+    --gold: #F5A623;
+    --green: #2E7D32;
+    --red: #C62828;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: var(--grey-light);
+    color: var(--black);
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--black);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: stretch;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 24px;
+    flex: 1;
+  }
+
+  .brand-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--cyan);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .brand-icon svg { width: 24px; height: 24px; fill: white; }
+
+  .brand-text .council {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cyan);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    line-height: 1;
+  }
+
+  .brand-text .title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.1;
+  }
+
+  .brand-text .title span { color: var(--cyan); }
+
+  .header-meta {
+    background: var(--cyan);
+    padding: 14px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .header-meta .release {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--black);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .header-meta .date {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--black);
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    background: var(--white);
+    border-bottom: 3px solid var(--cyan);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+
+  .nav-tab {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 14px 20px;
+    cursor: pointer;
+    border: none;
+    background: none;
+    color: var(--grey-text);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .nav-tab:hover { color: var(--cyan-dark); }
+  .nav-tab.active { color: var(--cyan-dark); border-bottom-color: var(--cyan); }
+
+  /* MAIN LAYOUT */
+  .page-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px 24px;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--cyan-dark);
+    margin-bottom: 12px;
+    padding-left: 10px;
+    border-left: 3px solid var(--cyan);
+  }
+
+  /* METRIC CARDS */
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .metric-card {
+    background: var(--white);
+    border-top: 4px solid var(--cyan);
+    padding: 18px 16px 14px;
+  }
+
+  .metric-card.accent { border-top-color: var(--black); }
+  .metric-card.gold { border-top-color: var(--gold); }
+
+  .metric-card .label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--grey-text);
+    margin-bottom: 8px;
+  }
+
+  .metric-card .value {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--black);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .metric-card .sub {
+    font-size: 12px;
+    color: var(--grey-text);
+  }
+
+  .metric-card .sub.up { color: var(--green); font-weight: 600; }
+  .metric-card .sub.dn { color: var(--red); font-weight: 600; }
+  .metric-card .sub.ne { color: var(--grey-text); }
+
+  /* CHART CARDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  .card {
+    background: var(--white);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--black);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--cyan);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .badge {
+    font-size: 10px;
+    background: var(--cyan);
+    color: var(--white);
+    padding: 2px 7px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  /* BAR ROWS */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .bar-label {
+    font-size: 12px;
+    color: var(--black);
+    width: 190px;
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--grey-mid);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: var(--cyan);
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .bar-fill.accent { background: var(--black); }
+  .bar-fill.gold { background: var(--gold); }
+
+  .bar-val {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--grey-text);
+    width: 65px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* TABLE */
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .data-table th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    background: var(--black);
+    padding: 10px 12px;
+    text-align: right;
+  }
+  .data-table th:first-child { text-align: left; background: var(--cyan-dark); }
+  .data-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--grey-mid);
+    text-align: right;
+    color: var(--black);
+  }
+  .data-table td:first-child { text-align: left; font-weight: 500; }
+  .data-table tr:hover td { background: var(--cyan-light); }
+  .data-table tr.total td { background: var(--black); color: var(--white); font-weight: 700; border-bottom: none; }
+  .data-table tr.total td:first-child { background: var(--cyan-dark); }
+
+  .change-up { color: var(--green); font-weight: 700; }
+  .change-dn { color: var(--red); font-weight: 700; }
+
+  /* CALLOUT STRIP */
+  .callout-strip {
+    background: var(--cyan);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .callout-strip .icon {
+    width: 36px;
+    height: 36px;
+    background: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .callout-strip .icon svg { width: 18px; height: 18px; fill: var(--cyan); }
+
+  .callout-strip .text {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .callout-strip .text span { font-weight: 400; text-transform: none; font-family: 'Barlow', sans-serif; font-size: 13px; display: block; margin-top: 2px; }
+
+  /* LEGEND */
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--grey-text); font-weight: 500; }
+  .legend-box { width: 12px; height: 12px; flex-shrink: 0; }
+
+  /* INSIGHT CARDS */
+  .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .insight-card {
+    background: var(--white);
+    border-left: 4px solid var(--cyan);
+    padding: 14px 16px;
+  }
+  .insight-card.warn { border-left-color: var(--gold); }
+  .insight-card.strong { border-left-color: var(--black); }
+  .insight-card .insight-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--cyan-dark);
+    margin-bottom: 5px;
+  }
+  .insight-card.warn .insight-label { color: var(--gold); }
+  .insight-card.strong .insight-label { color: var(--black); }
+  .insight-card p { font-size: 13px; line-height: 1.5; color: var(--black); }
+
+  /* FOOTER */
+  .site-footer {
+    background: var(--black);
+    color: var(--white);
+    padding: 20px 24px;
+    margin-top: 40px;
+    text-align: center;
+  }
+  .site-footer .footer-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .site-footer .footer-brand { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+  .site-footer .footer-brand span { color: var(--cyan); }
+  .site-footer .footer-contact { font-size: 12px; color: #aaa; }
+  .site-footer .footer-contact a { color: var(--cyan); text-decoration: none; }
+  .site-footer .footer-source { font-size: 11px; color: #666; }
+
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .bar-label { width: 130px; }
+    .header-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+      </div>
+      <div class="brand-text">
+        <div class="council">District Council of Yankalilla</div>
+        <div class="title">Do Business <span>Fleurieu Coast</span></div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="release">REMPLAN Economy</div>
+      <div class="date">2025 Release 1 &amp; 2024 Release 2</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div style="background:var(--white); border-bottom: 3px solid var(--cyan);">
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('overview', this)">Overview</button>
+    <button class="nav-tab" onclick="switchTab('comparison', this)">Year on Year</button>
+    <button class="nav-tab" onclick="switchTab('sectors', this)">Industry Sectors</button>
+    <button class="nav-tab" onclick="switchTab('employment', this)">Employment</button>
+    <button class="nav-tab" onclick="switchTab('trade', this)">Trade &amp; Value</button>
+    <button class="nav-tab" onclick="switchTab('insights', this)">Key Insights</button>
+  </nav>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ===================== OVERVIEW ===================== -->
+  <div id="overview" class="panel active">
+    <div class="section-label">Yankalilla LGA — Economic Snapshot · 2025 Release 1</div>
+
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="label">Total Output</div>
+        <div class="value">$610M</div>
+        <div class="sub up">▲ +6.2% vs 2024</div>
+      </div>
+      <div class="metric-card accent">
+        <div class="label">Total Employment</div>
+        <div class="value">1,639</div>
+        <div class="sub ne">→ Stable YoY</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Gross Regional Product</div>
+        <div class="value">$295M</div>
+        <div class="sub up">▲ +6.2% vs 2024</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Wages &amp; Salaries</div>
+        <div class="value">$115M</div>
+        <div class="sub up">▲ +6.1% vs 2024</div>
+      </div>
+      <div class="metric-card gold">
+        <div class="label">Regional Exports</div>
+        <div class="value">$250M</div>
+        <div class="sub up">▲ +6.1% vs 2024</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Trade Surplus</div>
+        <div class="value">$70.5M</div>
+        <div class="sub up">▲ from $66.5M</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Output by Sector — Top 6 ($M) <span class="badge">2025 Rel. 1</span></div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-box" style="background:#B2EBF2;"></div>2024 Rel. 2</div>
+          <div class="legend-item"><div class="legend-box" style="background:#00BCD4;"></div>2025 Rel. 1</div>
+        </div>
+        <div style="position:relative;height:240px;"><canvas id="overviewOutput"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Employment Share — 2025 Rel. 1</div>
+        <div style="position:relative;height:270px;"><canvas id="overviewPie"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Economic Flow — Key Indicators ($M) <span class="badge">2025 Rel. 1</span></div>
+      <div style="position:relative;height:200px;"><canvas id="overviewFlow"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ===================== YEAR ON YEAR ===================== -->
+  <div id="comparison" class="panel">
+    <div class="section-label">Year-on-Year Change · 2024 Release 2 vs 2025 Release 1</div>
+
+    <div class="callout-strip">
+      <div class="icon">
+        <svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+      </div>
+      <div class="text">
+        Uniform ~6.2% uplift across all sectors
+        <span>Employment held steady at 1,639 jobs both releases — the dollar growth reflects a price/CPI adjustment between REMPLAN data releases rather than structural sector change. Use relative sector positions for strategic analysis.</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Output Change by Sector ($M increase, 2024 → 2025)</div>
+      <div style="position:relative;height:320px;"><canvas id="deltaChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Full Sector Comparison — All REMPLAN Metrics</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Sector</th>
+              <th>Output 2024 $M</th>
+              <th>Output 2025 $M</th>
+              <th>Change</th>
+              <th>Jobs</th>
+              <th>GRP 2024 $M</th>
+              <th>GRP 2025 $M</th>
+            </tr>
+          </thead>
+          <tbody id="compareTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SECTORS ===================== -->
+  <div id="sectors" class="panel">
+    <div class="section-label">Industry Sector Analysis · 2025 Release 1</div>
+
+    <div class="card">
+      <div class="card-title">Output by Industry Sector — All Sectors ($M)</div>
+      <div id="outputBars"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Value Added (GRP Contribution) — All Sectors ($M)</div>
+        <div id="valueBars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Value-Add Ratio by Sector</div>
+        <p style="font-size:12px;color:var(--grey-text);margin-bottom:14px;">Value added as % of output — higher ratio = more productive</p>
+        <div id="ratioBars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== EMPLOYMENT ===================== -->
+  <div id="employment" class="panel">
+    <div class="section-label">Employment &amp; Workforce · 2025 Release 1</div>
+
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="label">Total Jobs</div>
+        <div class="value">1,639</div>
+        <div class="sub ne">All sectors combined</div>
+      </div>
+      <div class="metric-card accent">
+        <div class="label">Top Employer</div>
+        <div class="value">Agriculture</div>
+        <div class="sub ne">348 jobs · 21.2%</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Tourism Jobs</div>
+        <div class="value">222</div>
+        <div class="sub ne">Acc. &amp; Food · 13.5%</div>
+      </div>
+      <div class="metric-card gold">
+        <div class="label">Avg Wage 2025</div>
+        <div class="value">$70.3K</div>
+        <div class="sub up">▲ from $66.2K</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Highest Wage Sector</div>
+        <div class="value">Public Admin</div>
+        <div class="sub ne">$150K avg per job</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Employment by Sector — All Industries</div>
+      <div id="empBars"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Average Wage by Sector (Wages ÷ Jobs, $K) <span class="badge">2025 Rel. 1</span></div>
+      <div style="position:relative;height:300px;"><canvas id="avgWageChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- ===================== TRADE ===================== -->
+  <div id="trade" class="panel">
+    <div class="section-label">Trade Flows &amp; Value Added · 2025 Release 1</div>
+
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="label">Regional Exports</div>
+        <div class="value">$249.5M</div>
+        <div class="sub up">▲ +$14.4M YoY</div>
+      </div>
+      <div class="metric-card accent">
+        <div class="label">Regional Imports</div>
+        <div class="value">$179.0M</div>
+        <div class="sub dn">▲ +$10.4M YoY</div>
+      </div>
+      <div class="metric-card gold">
+        <div class="label">Trade Surplus</div>
+        <div class="value">$70.5M</div>
+        <div class="sub up">▲ from $66.5M</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Agri Export Share</div>
+        <div class="value">57.2%</div>
+        <div class="sub ne">$142.8M of $249.5M</div>
+      </div>
+      <div class="metric-card">
+        <div class="label">Local Sales</div>
+        <div class="value">$136.2M</div>
+        <div class="sub up">▲ from $128.3M</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Top Export Sectors ($M)</div>
+        <div id="exportBars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top Import Sectors ($M)</div>
+        <div id="importBars"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Full REMPLAN Summary Table — 2025 Release 1</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Sector</th>
+              <th>Output $M</th>
+              <th>Jobs</th>
+              <th>Wages $M</th>
+              <th>Local Sales $M</th>
+              <th>Exports $M</th>
+              <th>Imports $M</th>
+              <th>Value Added $M</th>
+            </tr>
+          </thead>
+          <tbody id="fullTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== INSIGHTS ===================== -->
+  <div id="insights" class="panel">
+    <div class="section-label">Strategic Insights for Council Leadership</div>
+
+    <div class="insight-grid">
+      <div class="insight-card strong">
+        <div class="insight-label">Agriculture Dominance</div>
+        <p>Agriculture accounts for 28.6% of total output ($174.6M) but pays the lowest average wages (~$28.3K/job). High economic output, low wage return — a structural vulnerability for household income.</p>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">Tourism Engine</div>
+        <p>Accommodation &amp; Food is the #1 employer at 222 jobs (13.5%) with $17.8M in regional exports. This is the clearest signal of a visitor economy — and the sector with the greatest capacity to grow.</p>
+      </div>
+      <div class="insight-card warn">
+        <div class="insight-label">Export Concentration Risk</div>
+        <p>Agriculture generates 57.2% of all regional exports ($142.8M of $249.5M). A single sector driving over half the export base is a significant structural risk to regional economic resilience.</p>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">Real Estate Value Trap</div>
+        <p>Real Estate has the highest value-add ratio (76%) and $69.9M output — but only 29 jobs. This reflects land and asset values, not productive employment. Not a sector for job-creation investment.</p>
+      </div>
+      <div class="insight-card strong">
+        <div class="insight-label">Health &amp; Social Opportunity</div>
+        <p>Health &amp; Social Assistance pays ~$103.5K average per job — the highest wage accessible to local residents. 165 jobs and growing. Expanding health services would lift median household income significantly.</p>
+      </div>
+      <div class="insight-card warn">
+        <div class="insight-label">Stable but Low Job Growth</div>
+        <p>Employment has remained flat at 1,639 jobs across both REMPLAN releases. Economic output has grown ~6% but no new jobs have been created. Productivity is rising without workforce expansion.</p>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">Construction Strength</div>
+        <p>Construction is the 3rd largest sector at $77.8M output, 143 jobs and a strong local sales base of $31.4M. Activity likely driven by residential demand — an indicator of population growth confidence.</p>
+      </div>
+      <div class="insight-card strong">
+        <div class="insight-label">Trade Surplus Growing</div>
+        <p>The regional trade surplus improved from $66.5M to $70.5M — a positive indicator of economic self-sufficiency. Exports growing faster than imports signals a net outward flow of economic value.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Priority Action Areas for Economic Development</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Focus Area</th>
+              <th>Rationale</th>
+              <th>Key Sectors</th>
+              <th>Expected Outcome</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1 — High</strong></td>
+              <td>Tourism &amp; visitor economy growth</td>
+              <td>Largest employer, strong export credentials, growth headroom</td>
+              <td>Accommodation &amp; Food ($36.6M)</td>
+              <td>Jobs + wages + local spend increase</td>
+            </tr>
+            <tr>
+              <td><strong>2 — High</strong></td>
+              <td>Export diversification</td>
+              <td>57% export dependence on Agriculture is a resilience risk</td>
+              <td>Manufacturing, Tourism, Prof. Services</td>
+              <td>Reduced concentration, more resilient economy</td>
+            </tr>
+            <tr>
+              <td><strong>3 — Medium</strong></td>
+              <td>Health services expansion</td>
+              <td>Highest wage accessible sector — raises median income</td>
+              <td>Health &amp; Social ($28.1M, 165 jobs)</td>
+              <td>Higher avg wages, essential services retention</td>
+            </tr>
+            <tr>
+              <td><strong>4 — Medium</strong></td>
+              <td>Agricultural value-adding</td>
+              <td>High output, low wages — processing &amp; value chain investment</td>
+              <td>Agriculture ($174.6M)</td>
+              <td>Higher margins, better-paid local employment</td>
+            </tr>
+            <tr>
+              <td><strong>5 — Ongoing</strong></td>
+              <td>Business retention &amp; networking</td>
+              <td>Stable employment base needs support to grow</td>
+              <td>Retail, Prof. Services, Admin (344 jobs)</td>
+              <td>Reduce business exits, grow local capacity</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">Do Business <span>Fleurieu Coast</span></div>
+    <div class="footer-contact">
+      <a href="mailto:business@yankalilla.sa.gov.au">business@yankalilla.sa.gov.au</a> &nbsp;|&nbsp;
+      facebook.com/dobusinessfleirieucoast
+    </div>
+    <div class="footer-source">Data: REMPLAN Economy · 2024 Rel. 2 &amp; 2025 Rel. 1 · District Council of Yankalilla · remplan.com.au</div>
+  </div>
+</footer>
+
+<script>
+const sectors = [
+  { short:'Agriculture',    output24:164.52, output25:174.63, jobs:348,  wages24:9.26,  wages25:9.83,  exports25:142.82, imports25:57.32, localSales25:23.44, va24:73.55,  va25:78.07,  color:'#00897B' },
+  { short:'Mining',         output24:9.16,   output25:9.72,   jobs:10,   wages24:1.20,  wages25:1.28,  exports25:9.40,  imports25:2.40,  localSales25:0.28,  va24:6.00,   va25:6.37,   color:'#78909C' },
+  { short:'Manufacturing',  output24:32.70,  output25:34.71,  jobs:54,   wages24:4.47,  wages25:4.75,  exports25:23.14, imports25:14.69, localSales25:5.74,  va24:8.75,   va25:9.28,   color:'#F57F17' },
+  { short:'Utilities',      output24:26.20,  output25:27.81,  jobs:20,   wages24:3.43,  wages25:3.64,  exports25:9.71,  imports25:6.09,  localSales25:11.18, va24:10.96,  va25:11.64,  color:'#558B2F' },
+  { short:'Construction',   output24:73.31,  output25:77.82,  jobs:143,  wages24:10.76, wages25:11.42, exports25:12.42, imports25:29.20, localSales25:31.42, va24:19.54,  va25:20.74,  color:'#E64A19' },
+  { short:'Wholesale',      output24:9.39,   output25:9.96,   jobs:29,   wages24:2.90,  wages25:3.08,  exports25:1.33,  imports25:2.60,  localSales25:4.90,  va24:5.13,   va25:5.44,   color:'#6A1B9A' },
+  { short:'Retail',         output24:19.57,  output25:20.78,  jobs:149,  wages24:7.38,  wages25:7.84,  exports25:0.72,  imports25:4.38,  localSales25:4.26,  va24:11.71,  va25:12.43,  color:'#AD1457' },
+  { short:'Acc. & Food',    output24:34.50,  output25:36.62,  jobs:222,  wages24:8.73,  wages25:9.26,  exports25:17.78, imports25:15.94, localSales25:2.40,  va24:13.87,  va25:14.73,  color:'#00BCD4' },
+  { short:'Transport',      output24:24.48,  output25:25.98,  jobs:64,   wages24:5.36,  wages25:5.69,  exports25:15.52, imports25:8.78,  localSales25:8.07,  va24:10.64,  va25:11.29,  color:'#00695C' },
+  { short:'ICT',            output24:1.02,   output25:1.08,   jobs:4,    wages24:0.29,  wages25:0.31,  exports25:0.81,  imports25:0.21,  localSales25:0.00,  va24:0.76,   va25:0.81,   color:'#0277BD' },
+  { short:'Finance',        output24:10.71,  output25:11.36,  jobs:16,   wages24:2.06,  wages25:2.19,  exports25:0.81,  imports25:3.42,  localSales25:6.19,  va24:5.52,   va25:5.86,   color:'#1565C0' },
+  { short:'Real Estate',    output24:65.82,  output25:69.87,  jobs:29,   wages24:2.23,  wages25:2.36,  exports25:4.84,  imports25:9.33,  localSales25:8.07,  va24:49.75,  va25:52.81,  color:'#4527A0' },
+  { short:'Prof. Services', output24:18.43,  output25:19.56,  jobs:60,   wages24:6.72,  wages25:7.14,  exports25:0.61,  imports25:5.47,  localSales25:16.24, va24:9.26,   va25:9.83,   color:'#283593' },
+  { short:'Admin Services', output24:8.22,   output25:8.73,   jobs:66,   wages24:3.37,  wages25:3.57,  exports25:1.38,  imports25:2.13,  localSales25:6.70,  va24:4.36,   va25:4.63,   color:'#37474F' },
+  { short:'Public Admin',   output24:24.29,  output25:25.78,  jobs:79,   wages24:11.16, wages25:11.85, exports25:3.44,  imports25:5.74,  localSales25:2.68,  va24:13.44,  va25:14.27,  color:'#BF360C' },
+  { short:'Education',      output24:16.20,  output25:17.20,  jobs:125,  wages24:10.28, wages25:10.91, exports25:1.49,  imports25:2.72,  localSales25:0.10,  va24:11.79,  va25:12.52,  color:'#4E342E' },
+  { short:'Health & Social',output24:26.50,  output25:28.12,  jobs:165,  wages24:16.09, wages25:17.08, exports25:2.13,  imports25:4.61,  localSales25:0.44,  va24:18.74,  va25:19.89,  color:'#1B5E20' },
+  { short:'Arts & Rec',     output24:2.04,   output25:2.16,   jobs:11,   wages24:0.48,  wages25:0.51,  exports25:0.13,  imports25:0.75,  localSales25:0.62,  va24:0.74,   va25:0.79,   color:'#E65100' },
+  { short:'Other Services', output24:7.59,   output25:8.06,   jobs:45,   wages24:2.34,  wages25:2.49,  exports25:1.05,  imports25:3.18,  localSales25:3.44,  va24:3.22,   va25:3.42,   color:'#546E7A' },
+];
+
+const sorted25 = [...sectors].sort((a,b) => b.output25 - a.output25);
+const top6 = sorted25.slice(0,6);
+const maxOut = sorted25[0].output25;
+const maxVA = Math.max(...sectors.map(s=>s.va25));
+const maxJobs = Math.max(...sectors.map(s=>s.jobs));
+const maxExports = Math.max(...sectors.map(s=>s.exports25));
+const maxImports = Math.max(...sectors.map(s=>s.imports25));
+
+// OUTPUT BARS
+const ob = document.getElementById('outputBars');
+sorted25.forEach(s => {
+  ob.innerHTML += `<div class="bar-row">
+    <div class="bar-label">${s.short}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${(s.output25/maxOut*100).toFixed(1)}%;background:${s.color};"></div></div>
+    <div class="bar-val">$${s.output25.toFixed(1)}M</div>
+  </div>`;
+});
+
+// VALUE ADDED BARS
+const vb = document.getElementById('valueBars');
+[...sectors].sort((a,b)=>b.va25-a.va25).forEach(s => {
+  vb.innerHTML += `<div class="bar-row">
+    <div class="bar-label">${s.short}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${(s.va25/maxVA*100).toFixed(1)}%;background:${s.color};"></div></div>
+    <div class="bar-val">$${s.va25.toFixed(1)}M</div>
+  </div>`;
+});
+
+// VALUE ADD RATIO BARS
+const rb = document.getElementById('ratioBars');
+const maxRatio = 100;
+[...sectors].sort((a,b)=>(b.va25/b.output25)-(a.va25/a.output25)).forEach(s => {
+  const ratio = (s.va25/s.output25*100).toFixed(0);
+  const col = ratio >= 70 ? '#00BCD4' : ratio >= 50 ? '#F57F17' : '#78909C';
+  rb.innerHTML += `<div class="bar-row">
+    <div class="bar-label">${s.short}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${ratio}%;background:${col};"></div></div>
+    <div class="bar-val">${ratio}%</div>
+  </div>`;
+});
+
+// EMPLOYMENT BARS
+const eb = document.getElementById('empBars');
+[...sectors].sort((a,b)=>b.jobs-a.jobs).forEach(s => {
+  eb.innerHTML += `<div class="bar-row">
+    <div class="bar-label">${s.short}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${(s.jobs/maxJobs*100).toFixed(1)}%;background:${s.color};"></div></div>
+    <div class="bar-val">${s.jobs} jobs</div>
+  </div>`;
+});
+
+// EXPORT BARS
+const exb = document.getElementById('exportBars');
+[...sectors].sort((a,b)=>b.exports25-a.exports25).slice(0,10).forEach(s => {
+  exb.innerHTML += `<div class="bar-row">
+    <div class="bar-label">${s.short}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${(s.exports25/maxExports*100).toFixed(1)}%;background:${s.color};"></div></div>
+    <div class="bar-val">$${s.exports25.toFixed(1)}M</div>
+  </div>`;
+});
+
+// IMPORT BARS
+const imb = document.getElementById('importBars');
+[...sectors].sort((a,b)=>b.imports25-a.imports25).slice(0,10).forEach(s => {
+  imb.innerHTML += `<div class="bar-row">
+    <div class="bar-label">${s.short}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${(s.imports25/maxImports*100).toFixed(1)}%;background:${s.color};"></div></div>
+    <div class="bar-val">$${s.imports25.toFixed(1)}M</div>
+  </div>`;
+});
+
+// COMPARE TABLE
+const ct = document.getElementById('compareTableBody');
+sorted25.forEach(s => {
+  const delta = s.output25 - s.output24;
+  const pct = ((delta/s.output24)*100).toFixed(1);
+  const cls = delta >= 0 ? 'change-up' : 'change-dn';
+  const sign = delta >= 0 ? '+' : '';
+  ct.innerHTML += `<tr>
+    <td>${s.short}</td>
+    <td>$${s.output24.toFixed(1)}M</td>
+    <td>$${s.output25.toFixed(1)}M</td>
+    <td class="${cls}">${sign}$${Math.abs(delta).toFixed(1)}M (${sign}${pct}%)</td>
+    <td>${s.jobs}</td>
+    <td>$${s.va24.toFixed(1)}M</td>
+    <td>$${s.va25.toFixed(1)}M</td>
+  </tr>`;
+});
+ct.innerHTML += `<tr class="total"><td>Total</td><td>$574.6M</td><td>$610.0M</td><td>+$35.4M (+6.2%)</td><td>1,639</td><td>$277.7M</td><td>$294.8M</td></tr>`;
+
+// FULL TABLE
+const ft = document.getElementById('fullTableBody');
+sorted25.forEach(s => {
+  ft.innerHTML += `<tr>
+    <td>${s.short}</td>
+    <td>$${s.output25.toFixed(1)}M</td>
+    <td>${s.jobs}</td>
+    <td>$${s.wages25.toFixed(2)}M</td>
+    <td>$${s.localSales25.toFixed(1)}M</td>
+    <td>$${s.exports25.toFixed(1)}M</td>
+    <td>$${s.imports25.toFixed(1)}M</td>
+    <td>$${s.va25.toFixed(1)}M</td>
+  </tr>`;
+});
+ft.innerHTML += `<tr class="total"><td>Total</td><td>$610.0M</td><td>1,639</td><td>$115.2M</td><td>$136.2M</td><td>$249.5M</td><td>$179.0M</td><td>$294.8M</td></tr>`;
+
+// CHARTS
+const chartDefaults = { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ display:false } } };
+const gridColor = 'rgba(0,0,0,0.06)';
+
+new Chart(document.getElementById('overviewOutput'), {
+  type:'bar',
+  data:{
+    labels: top6.map(s=>s.short),
+    datasets:[
+      { label:'2024 Rel. 2', data: top6.map(s=>s.output24), backgroundColor:'#B2EBF2', borderRadius:2 },
+      { label:'2025 Rel. 1', data: top6.map(s=>s.output25), backgroundColor:'#00BCD4', borderRadius:2 }
+    ]
+  },
+  options:{ ...chartDefaults, scales:{ y:{ ticks:{ callback:v=>'$'+v+'M', font:{size:10} }, grid:{color:gridColor} }, x:{ ticks:{ font:{size:10}, maxRotation:25 }, grid:{display:false} } } }
+});
+
+new Chart(document.getElementById('overviewPie'), {
+  type:'doughnut',
+  data:{
+    labels: top6.map(s=>s.short),
+    datasets:[{ data: top6.map(s=>s.jobs), backgroundColor: top6.map(s=>s.color), borderWidth:3, borderColor:'#fff' }]
+  },
+  options:{ responsive:true, maintainAspectRatio:false, cutout:'55%', plugins:{ legend:{ display:true, position:'right', labels:{ font:{size:11}, boxWidth:10, padding:8 } } } }
+});
+
+new Chart(document.getElementById('overviewFlow'), {
+  type:'bar',
+  data:{
+    labels: ['Total Output','Regional Exports','Value Added (GRP)','Local Sales','Wages & Salaries','Regional Imports'],
+    datasets:[{ data:[610.0, 249.5, 294.8, 136.2, 115.2, 179.0], backgroundColor:['#00BCD4','#00897B','#1B5E20','#6A1B9A','#F57F17','#78909C'], borderRadius:3 }]
+  },
+  options:{ ...chartDefaults, scales:{ y:{ ticks:{ callback:v=>'$'+v+'M', font:{size:10} }, grid:{color:gridColor} }, x:{ ticks:{ font:{size:10}, maxRotation:20 }, grid:{display:false} } } }
+});
+
+// DELTA CHART
+const deltaData = [...sectors].map(s=>({ label:s.short, delta: parseFloat((s.output25-s.output24).toFixed(2)), color:s.color })).sort((a,b)=>b.delta-a.delta);
+new Chart(document.getElementById('deltaChart'), {
+  type:'bar',
+  data:{ labels: deltaData.map(d=>d.label), datasets:[{ data: deltaData.map(d=>d.delta), backgroundColor: deltaData.map(d=>d.color), borderRadius:3 }] },
+  options:{ ...chartDefaults, scales:{ y:{ ticks:{ callback:v=>'$'+v.toFixed(1)+'M', font:{size:10} }, grid:{color:gridColor} }, x:{ ticks:{ font:{size:10}, maxRotation:45 }, grid:{display:false} } } }
+});
+
+// AVG WAGE CHART
+const wageData = [...sectors].filter(s=>s.jobs>0).map(s=>({ label:s.short, wage: parseFloat((s.wages25/s.jobs*1000).toFixed(1)), color:s.color })).sort((a,b)=>b.wage-a.wage);
+new Chart(document.getElementById('avgWageChart'), {
+  type:'bar',
+  data:{ labels: wageData.map(d=>d.label), datasets:[{ data: wageData.map(d=>d.wage), backgroundColor: wageData.map(d=>d.color), borderRadius:3 }] },
+  options:{ ...chartDefaults, scales:{ y:{ ticks:{ callback:v=>'$'+v+'K', font:{size:10} }, grid:{color:gridColor} }, x:{ ticks:{ font:{size:10}, maxRotation:45 }, grid:{display:false} } } }
+});
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
