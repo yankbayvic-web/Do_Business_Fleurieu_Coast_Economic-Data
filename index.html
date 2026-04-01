@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yankalilla LGA — Economic Dashboard | Do Business Fleurieu Coast</title>
+<style>
+:root {
+  --cyan: #00BCD4; --cyan-dark: #0097A7; --cyan-light: #E0F7FA;
+  --black: #1A1A1A; --white: #FFFFFF; --grey-light: #F4F4F4;
+  --grey-mid: #E0E0E0; --grey-text: #666666;
+  --gold: #F5A623; --green: #2E7D32; --red: #C62828;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI',Arial,sans-serif; background: var(--grey-light); color: var(--black); font-size: 14px; line-height: 1.5; }
+.site-header { background: var(--black); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+.header-inner { display: flex; align-items: stretch; max-width: 1200px; margin: 0 auto; }
+.header-brand { display: flex; align-items: center; gap: 14px; padding: 14px 24px; flex: 1; }
+.brand-icon { width: 42px; height: 42px; background: var(--cyan); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.council { font-size: 11px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 0.12em; }
+.title { font-size: 20px; font-weight: 900; color: var(--white); text-transform: uppercase; letter-spacing: 0.04em; }
+.title span { color: var(--cyan); }
+.header-meta { background: var(--cyan); padding: 14px 24px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; }
+.header-meta .rel { font-size: 10px; font-weight: 700; color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; }
+.header-meta .dt { font-size: 13px; font-weight: 600; color: var(--black); }
+.nav-wrap { background: var(--white); border-bottom: 3px solid var(--cyan); }
+.nav-tabs { max-width: 1200px; margin: 0 auto; display: flex; padding: 0 24px; overflow-x: auto; }
+.nav-tab { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 14px 18px; cursor: pointer; border: none; background: none; color: var(--grey-text); border-bottom: 3px solid transparent; margin-bottom: -3px; white-space: nowrap; font-family: 'Segoe UI',Arial,sans-serif; }
+.nav-tab:hover { color: var(--cyan-dark); }
+.nav-tab.active { color: var(--cyan-dark); border-bottom-color: var(--cyan); }
+.page-wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px; }
+.panel { display: none; }
+.panel.active { display: block; }
+.sec-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--cyan-dark); margin-bottom: 14px; padding-left: 10px; border-left: 3px solid var(--cyan); }
+.metric-row { display: grid; grid-template-columns: repeat(auto-fit,minmax(155px,1fr)); gap: 12px; margin-bottom: 24px; }
+.mc { background: var(--white); border-top: 4px solid var(--cyan); padding: 18px 16px 14px; }
+.mc.acc { border-top-color: var(--black); }
+.mc.gld { border-top-color: var(--gold); }
+.mc .lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--grey-text); margin-bottom: 8px; font-family: 'Segoe UI',Arial,sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mc .val { font-size: 30px; font-weight: 900; color: var(--black); line-height: 1; margin-bottom: 6px; font-family: 'Segoe UI',Arial,sans-serif; }
+.mc .sub { font-size: 12px; color: var(--grey-text); }
+.mc .sub.up { color: var(--green); font-weight: 600; }
+.mc .sub.dn { color: var(--red); font-weight: 600; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+.card { background: var(--white); padding: 20px 20px 16px; margin-bottom: 16px; }
+.card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--black); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--cyan); display: flex; align-items: center; gap: 8px; font-family: 'Segoe UI',Arial,sans-serif; }
+.badge { font-size: 10px; background: var(--cyan); color: var(--white); padding: 2px 7px; font-weight: 700; letter-spacing: 0.04em; }
+.br { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.bl { font-size: 12px; color: var(--black); width: 190px; flex-shrink: 0; font-weight: 500; font-family: 'Segoe UI',Arial,sans-serif; }
+.bt { flex: 1; height: 8px; background: var(--grey-mid); overflow: hidden; }
+.bf { height: 100%; }
+.bv { font-size: 12px; font-weight: 700; color: var(--grey-text); width: 72px; text-align: right; flex-shrink: 0; font-family: 'Segoe UI',Arial,sans-serif; }
+canvas { display: block; }
+.callout { background: var(--cyan); padding: 16px 20px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 14px; }
+.callout-icon { width: 32px; height: 32px; background: var(--black); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.ct { font-size: 13px; font-weight: 700; color: var(--black); text-transform: uppercase; letter-spacing: 0.04em; }
+.cb { font-size: 12px; color: var(--black); margin-top: 4px; line-height: 1.5; }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--white); background: var(--black); padding: 9px 10px; text-align: right; white-space: nowrap; font-family: 'Segoe UI',Arial,sans-serif; }
+th:first-child { text-align: left; background: var(--cyan-dark); }
+td { padding: 8px 10px; border-bottom: 1px solid var(--grey-mid); text-align: right; }
+td:first-child { text-align: left; font-weight: 500; }
+tr:hover td { background: var(--cyan-light); }
+tr.tot td { background: var(--black); color: var(--white); font-weight: 700; border: none; }
+tr.tot td:first-child { background: var(--cyan-dark); }
+.cu { color: var(--green); font-weight: 700; }
+.cd { color: var(--red); font-weight: 700; }
+.ig { display: grid; grid-template-columns: repeat(auto-fit,minmax(230px,1fr)); gap: 12px; margin-bottom: 16px; }
+.ic { background: var(--white); border-left: 4px solid var(--cyan); padding: 14px 16px; }
+.ic.warn { border-left-color: var(--gold); }
+.ic.strong { border-left-color: var(--black); }
+.il { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyan-dark); margin-bottom: 6px; }
+.ic.warn .il { color: var(--gold); }
+.ic.strong .il { color: var(--black); }
+.ic p { font-size: 13px; line-height: 1.55; }
+.leg { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 12px; }
+.li { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--grey-text); }
+.lb { width: 12px; height: 12px; flex-shrink: 0; }
+.site-footer { background: var(--black); padding: 20px 24px; margin-top: 40px; }
+.fi { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.fb { font-size: 16px; font-weight: 900; text-transform: uppercase; color: var(--white); }
+.fb span { color: var(--cyan); }
+.fc { font-size: 12px; color: #aaa; }
+.fc a { color: var(--cyan); text-decoration: none; }
+.fs { font-size: 11px; color: #555; }
+@media(max-width:768px){.g2{grid-template-columns:1fr;}.bl{width:120px;font-size:11px;}.header-meta{display:none;}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <div class="brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg></div>
+      <div>
+        <div class="council">District Council of Yankalilla</div>
+        <div class="title">Do Business <span>Fleurieu Coast</span></div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="rel">REMPLAN Economy</div>
+      <div class="dt">2024 Rel. 2 &amp; 2025 Rel. 1</div>
+    </div>
+  </div>
+</header>
+
+<div class="nav-wrap">
+  <nav class="nav-tabs">
+    <button class="nav-tab active" onclick="switchTab('overview',this)">Overview</button>
+    <button class="nav-tab" onclick="switchTab('comparison',this)">Year on Year</button>
+    <button class="nav-tab" onclick="switchTab('sectors',this)">Industry Sectors</button>
+    <button class="nav-tab" onclick="switchTab('employment',this)">Employment</button>
+    <button class="nav-tab" onclick="switchTab('trade',this)">Trade &amp; Value</button>
+    <button class="nav-tab" onclick="switchTab('insights',this)">Key Insights</button>
+  </nav>
+</div>
+
+<div class="page-wrap">
+
+<div id="overview" class="panel active">
+  <div class="sec-label">Yankalilla LGA — Economic Snapshot · 2025 Release 1</div>
+  <div class="metric-row">
+    <div class="mc"><div class="lbl">Total Output</div><div class="val">$610M</div><div class="sub up">▲ +6.2% vs 2024</div></div>
+    <div class="mc acc"><div class="lbl">Total Employment</div><div class="val">1,639</div><div class="sub">→ Stable YoY</div></div>
+    <div class="mc"><div class="lbl">Gross Regional Product</div><div class="val">$295M</div><div class="sub up">▲ +6.2% vs 2024</div></div>
+    <div class="mc"><div class="lbl">Wages &amp; Salaries</div><div class="val">$115M</div><div class="sub up">▲ +6.1% vs 2024</div></div>
+    <div class="mc gld"><div class="lbl">Regional Exports</div><div class="val">$250M</div><div class="sub up">▲ +6.1% vs 2024</div></div>
+    <div class="mc"><div class="lbl">Trade Surplus</div><div class="val">$70.5M</div><div class="sub up">▲ from $66.5M</div></div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">Output by Sector — Top 6 ($M) <span class="badge">2024 vs 2025</span></div>
+      <div class="leg"><div class="li"><div class="lb" style="background:#B2EBF2;"></div>2024 Rel. 2</div><div class="li"><div class="lb" style="background:#00BCD4;"></div>2025 Rel. 1</div></div>
+      <canvas id="c1" height="220"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-title">Employment Share — Top 6 Sectors</div>
+      <canvas id="c2" height="260"></canvas>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Economic Flow — Key Indicators ($M) <span class="badge">2025 Rel. 1</span></div>
+    <canvas id="c3" height="200"></canvas>
+  </div>
+</div>
+
+<div id="comparison" class="panel">
+  <div class="sec-label">Year-on-Year · 2024 Release 2 vs 2025 Release 1</div>
+  <div class="callout">
+    <div class="callout-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="#00BCD4"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg></div>
+    <div><div class="ct">Uniform ~6.2% uplift across all sectors</div><div class="cb">Employment held steady at 1,639 jobs in both releases. The dollar growth reflects a price/CPI adjustment between REMPLAN data releases rather than structural sector change. Use relative sector positions for strategic analysis.</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Output Change by Sector — 2024 → 2025 ($M increase)</div>
+    <canvas id="c4" height="380"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-title">Full Sector Comparison</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Sector</th><th>Output 2024 $M</th><th>Output 2025 $M</th><th>Change</th><th>Jobs</th><th>GRP 2024 $M</th><th>GRP 2025 $M</th></tr></thead><tbody id="tb1"></tbody></table></div>
+  </div>
+</div>
+
+<div id="sectors" class="panel">
+  <div class="sec-label">Industry Sector Analysis · 2025 Release 1</div>
+  <div class="card"><div class="card-title">Output by Industry Sector — All Sectors ($M)</div><div id="b1"></div></div>
+  <div class="g2">
+    <div class="card"><div class="card-title">Value Added (GRP Contribution) ($M)</div><div id="b2"></div></div>
+    <div class="card"><div class="card-title">Value-Add Ratio by Sector (%)</div><p style="font-size:11px;color:var(--grey-text);margin-bottom:12px;">Value added as % of output — higher = more productive</p><div id="b3"></div></div>
+  </div>
+</div>
+
+<div id="employment" class="panel">
+  <div class="sec-label">Employment &amp; Workforce · 2025 Release 1</div>
+  <div class="metric-row">
+    <div class="mc"><div class="lbl">Total Jobs</div><div class="val">1,639</div><div class="sub">All sectors</div></div>
+    <div class="mc acc"><div class="lbl">Top Employer</div><div class="val">Agriculture</div><div class="sub">348 jobs · 21.2%</div></div>
+    <div class="mc"><div class="lbl">Tourism Jobs</div><div class="val">222</div><div class="sub">Acc. &amp; Food · 13.5%</div></div>
+    <div class="mc gld"><div class="lbl">Avg Wage 2025</div><div class="val">$70.3K</div><div class="sub up">▲ from $66.2K</div></div>
+    <div class="mc"><div class="lbl">Highest Wage Sector</div><div class="val">Utilities</div><div class="sub">$182K avg per job</div></div>
+  </div>
+  <div class="card"><div class="card-title">Employment by Sector — All Industries</div><div id="b4"></div></div>
+  <div class="card"><div class="card-title">Average Wage by Sector ($K) <span class="badge">2025 Rel. 1</span></div><canvas id="c5" height="380"></canvas></div>
+</div>
+
+<div id="trade" class="panel">
+  <div class="sec-label">Trade Flows &amp; Value Added · 2025 Release 1</div>
+  <div class="metric-row">
+    <div class="mc"><div class="lbl">Regional Exports</div><div class="val">$249.5M</div><div class="sub up">▲ +$14.4M YoY</div></div>
+    <div class="mc acc"><div class="lbl">Regional Imports</div><div class="val">$179.0M</div><div class="sub dn">▲ +$10.4M YoY</div></div>
+    <div class="mc gld"><div class="lbl">Trade Surplus</div><div class="val">$70.5M</div><div class="sub up">▲ from $66.5M</div></div>
+    <div class="mc"><div class="lbl">Agri Export Share</div><div class="val">57.2%</div><div class="sub">$142.8M of $249.5M</div></div>
+    <div class="mc"><div class="lbl">Local Sales</div><div class="val">$136.2M</div><div class="sub up">▲ from $128.3M</div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="card-title">Top Export Sectors ($M)</div><div id="b5"></div></div>
+    <div class="card"><div class="card-title">Top Import Sectors ($M)</div><div id="b6"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Full REMPLAN Summary — 2025 Release 1</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Sector</th><th>Output $M</th><th>Jobs</th><th>Wages $M</th><th>Local Sales $M</th><th>Exports $M</th><th>Imports $M</th><th>Value Added $M</th></tr></thead><tbody id="tb2"></tbody></table></div>
+  </div>
+</div>
+
+<div id="insights" class="panel">
+  <div class="sec-label">Strategic Insights</div>
+  <div class="ig">
+    <div class="ic strong"><div class="il">Agriculture Dominance</div><p>Agriculture accounts for 28.6% of total output ($174.6M) and is the largest employer at 348 jobs, yet pays the lowest average wages (~$28.3K/job). High economic output, low wage return — a structural vulnerability for household income.</p></div>
+    <div class="ic"><div class="il">Tourism Engine</div><p>Accommodation &amp; Food is the 2nd largest employer at 222 jobs (13.5%) and generates $17.8M in regional exports — the strongest tourism export signal in the region. It is the sector with the greatest capacity for job-rich growth.</p></div>
+    <div class="ic warn"><div class="il">Export Concentration Risk</div><p>Agriculture generates 57.2% of all regional exports ($142.8M of $249.5M). A single sector driving over half the export base is a significant structural risk to regional economic resilience.</p></div>
+    <div class="ic"><div class="il">Real Estate Value Trap</div><p>Real Estate has the highest value-add ratio (76%) and $69.9M output — but only 29 jobs. This reflects land and asset values, not productive employment. Not a sector for job-creation investment.</p></div>
+    <div class="ic strong"><div class="il">Health &amp; Social Opportunity</div><p>Health &amp; Social Assistance pays ~$103.5K average per job — the highest wage accessible to local residents. 165 jobs and growing. Expanding health services would lift median household income significantly.</p></div>
+    <div class="ic warn"><div class="il">Stable but Low Job Growth</div><p>Employment has remained flat at 1,639 jobs across both REMPLAN releases. Economic output has grown ~6% but no new jobs have been created. Productivity is rising without workforce expansion.</p></div>
+    <div class="ic"><div class="il">Construction Strength</div><p>Construction is the 3rd largest sector at $77.8M output, 143 jobs and $31.4M local sales. Activity likely driven by residential demand — an indicator of population growth confidence.</p></div>
+    <div class="ic strong"><div class="il">Trade Surplus Growing</div><p>The regional trade surplus improved from $66.5M to $70.5M — exports growing faster than imports signals a net outward flow of economic value and improving self-sufficiency.</p></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Priority Action Areas</div>
+    <div class="tbl-wrap"><table><thead><tr><th>Priority</th><th>Focus Area</th><th>Rationale</th><th>Key Sectors</th><th>Expected Outcome</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1 — High</strong></td><td>Tourism &amp; visitor economy</td><td>2nd largest employer, strong export credentials</td><td>Acc. &amp; Food ($36.6M)</td><td>Jobs + wages + local spend</td></tr>
+      <tr><td><strong>2 — High</strong></td><td>Export diversification</td><td>57% export dependence on Agriculture</td><td>Manufacturing, Tourism, Prof. Services</td><td>Reduced concentration risk</td></tr>
+      <tr><td><strong>3 — Medium</strong></td><td>Health services expansion</td><td>Highest wage accessible sector</td><td>Health &amp; Social ($28.1M, 165 jobs)</td><td>Higher avg wages, service retention</td></tr>
+      <tr><td><strong>4 — Medium</strong></td><td>Agricultural value-adding</td><td>High output, low wages — value chain gap</td><td>Agriculture ($174.6M)</td><td>Better-paid local employment</td></tr>
+      <tr><td><strong>5 — Ongoing</strong></td><td>Business retention &amp; networking</td><td>Stable base needs support to grow</td><td>Retail, Prof. Services, Admin</td><td>Reduce exits, grow local capacity</td></tr>
+    </tbody></table></div>
+  </div>
+</div>
+
+</div>
+
+<footer class="site-footer">
+  <div class="fi">
+    <div class="fb">Do Business <span>Fleurieu Coast</span></div>
+    <div class="fc"><a href="mailto:business@yankalilla.sa.gov.au">business@yankalilla.sa.gov.au</a> &nbsp;|&nbsp; facebook.com/dobusinessfleirieucoast</div>
+    <div class="fs">Data: REMPLAN Economy · 2024 Rel. 2 &amp; 2025 Rel. 1 · District Council of Yankalilla · remplan.com.au</div>
+  </div>
+</footer>
+
+<script>
+var S=[
+  {n:'Agriculture',    o24:164.52,o25:174.63,j:348, w25:9.83, ex25:142.82,im25:57.32,ls25:23.44,va24:73.55,va25:78.07,c:'#00897B'},
+  {n:'Mining',         o24:9.16,  o25:9.72,  j:10,  w25:1.28, ex25:9.40,  im25:2.40, ls25:0.28, va24:6.00, va25:6.37, c:'#78909C'},
+  {n:'Manufacturing',  o24:32.70, o25:34.71, j:54,  w25:4.75, ex25:23.14, im25:14.69,ls25:5.74, va24:8.75, va25:9.28, c:'#F57F17'},
+  {n:'Utilities',      o24:26.20, o25:27.81, j:20,  w25:3.64, ex25:9.71,  im25:6.09, ls25:11.18,va24:10.96,va25:11.64,c:'#558B2F'},
+  {n:'Construction',   o24:73.31, o25:77.82, j:143, w25:11.42,ex25:12.42, im25:29.20,ls25:31.42,va24:19.54,va25:20.74,c:'#E64A19'},
+  {n:'Wholesale',      o24:9.39,  o25:9.96,  j:29,  w25:3.08, ex25:1.33,  im25:2.60, ls25:4.90, va24:5.13, va25:5.44, c:'#6A1B9A'},
+  {n:'Retail',         o24:19.57, o25:20.78, j:149, w25:7.84, ex25:0.72,  im25:4.38, ls25:4.26, va24:11.71,va25:12.43,c:'#AD1457'},
+  {n:'Acc. & Food',    o24:34.50, o25:36.62, j:222, w25:9.26, ex25:17.78, im25:15.94,ls25:2.40, va24:13.87,va25:14.73,c:'#00BCD4'},
+  {n:'Transport',      o24:24.48, o25:25.98, j:64,  w25:5.69, ex25:15.52, im25:8.78, ls25:8.07, va24:10.64,va25:11.29,c:'#00695C'},
+  {n:'ICT',            o24:1.02,  o25:1.08,  j:4,   w25:0.31, ex25:0.81,  im25:0.21, ls25:0.00, va24:0.76, va25:0.81, c:'#0277BD'},
+  {n:'Finance',        o24:10.71, o25:11.36, j:16,  w25:2.19, ex25:0.81,  im25:3.42, ls25:6.19, va24:5.52, va25:5.86, c:'#1565C0'},
+  {n:'Real Estate',    o24:65.82, o25:69.87, j:29,  w25:2.36, ex25:4.84,  im25:9.33, ls25:8.07, va24:49.75,va25:52.81,c:'#4527A0'},
+  {n:'Prof. Services', o24:18.43, o25:19.56, j:60,  w25:7.14, ex25:0.61,  im25:5.47, ls25:16.24,va24:9.26, va25:9.83, c:'#283593'},
+  {n:'Admin Services', o24:8.22,  o25:8.73,  j:66,  w25:3.57, ex25:1.38,  im25:2.13, ls25:6.70, va24:4.36, va25:4.63, c:'#37474F'},
+  {n:'Public Admin',   o24:24.29, o25:25.78, j:79,  w25:11.85,ex25:3.44,  im25:5.74, ls25:2.68, va24:13.44,va25:14.27,c:'#BF360C'},
+  {n:'Education',      o24:16.20, o25:17.20, j:125, w25:10.91,ex25:1.49,  im25:2.72, ls25:0.10, va24:11.79,va25:12.52,c:'#4E342E'},
+  {n:'Health & Social',o24:26.50, o25:28.12, j:165, w25:17.08,ex25:2.13,  im25:4.61, ls25:0.44, va24:18.74,va25:19.89,c:'#1B5E20'},
+  {n:'Arts & Rec',     o24:2.04,  o25:2.16,  j:11,  w25:0.51, ex25:0.13,  im25:0.75, ls25:0.62, va24:0.74, va25:0.79, c:'#E65100'},
+  {n:'Other Services', o24:7.59,  o25:8.06,  j:45,  w25:2.49, ex25:1.05,  im25:3.18, ls25:3.44, va24:3.22, va25:3.42, c:'#546E7A'}
+];
+
+function srt(arr,k){return arr.slice().sort(function(a,b){return b[k]-a[k];});}
+
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function bars(id,data,vk,ck,fmt){
+  var max=Math.max.apply(null,data.map(function(d){return d[vk];}));
+  var h='';
+  data.forEach(function(d){
+    var v=d[vk], p=(v/max*100).toFixed(1);
+    var label=fmt==='jobs'?(v+' jobs'):('$'+v.toFixed(1)+'M');
+    h+='<div class="br"><div class="bl">'+d.n+'</div><div class="bt"><div class="bf" style="width:'+p+'%;background:'+d[ck]+';"></div></div><div class="bv">'+label+'</div></div>';
+  });
+  document.getElementById(id).innerHTML=h;
+}
+
+function chart(id,labels,datasets,opts){
+  var el=document.getElementById(id); if(!el)return;
+  var dpr=window.devicePixelRatio||1;
+  var W=el.parentElement.clientWidth||600;
+  var H=parseInt(el.getAttribute('height'))||260;
+  el.width=W*dpr; el.height=H*dpr;
+  el.style.width=W+'px'; el.style.height=H+'px';
+  var ctx=el.getContext('2d'); ctx.scale(dpr,dpr);
+  var pL=opts.pL||56,pR=opts.pR||12,pT=20,pB=opts.pB||65;
+  var cW=W-pL-pR, cH=H-pT-pB;
+  var all=[]; datasets.forEach(function(ds){all=all.concat(ds.data);});
+  var mx=Math.max.apply(null,all)*1.08, mn=Math.min(0,Math.min.apply(null,all));
+  var range=mx-mn;
+  var n=labels.length, gc=datasets.length;
+  var gW=cW/n, bW=(gW*0.85-(gc-1)*2)/gc;
+  // grid
+  for(var i=0;i<=5;i++){
+    var v=mn+range*i/5;
+    var y=pT+cH-(v-mn)/range*cH;
+    ctx.strokeStyle='#e8e8e8'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(pL,y); ctx.lineTo(pL+cW,y); ctx.stroke();
+    ctx.fillStyle='#888'; ctx.font='10px "Segoe UI",Arial,sans-serif'; ctx.textAlign='right';
+    var lbl=opts.fmtY?opts.fmtY(v):('$'+v.toFixed(0)+'M');
+    ctx.fillText(lbl,pL-4,y+3);
+  }
+  // zero
+  if(mn<0){var zy=pT+cH-(-mn)/range*cH; ctx.strokeStyle='#aaa'; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(pL,zy); ctx.lineTo(pL+cW,zy); ctx.stroke();}
+  // bars
+  datasets.forEach(function(ds,di){
+    labels.forEach(function(lbl,li){
+      var v=ds.data[li];
+      var col=Array.isArray(ds.colors)?ds.colors[li]:ds.color;
+      var x=pL+li*gW+gW*0.11+di*(bW+2);
+      var baseY=pT+cH-(-mn)/range*cH;
+      var bh=Math.abs(v)/range*cH;
+      var by=v>=0?baseY-bh:baseY;
+      ctx.fillStyle=col; ctx.fillRect(Math.round(x),Math.round(by),Math.round(bW),Math.round(bh));
+    });
+  });
+  // x labels - rotated 45deg for clarity
+  ctx.fillStyle='#444'; ctx.font='10px "Segoe UI",Arial,sans-serif';
+  labels.forEach(function(lbl,li){
+    var cx=pL+li*gW+gW/2;
+    ctx.save();
+    ctx.translate(cx, pT+cH+8);
+    ctx.rotate(-Math.PI/4);
+    ctx.textAlign='right';
+    ctx.fillText(lbl, 0, 0);
+    ctx.restore();
+  });
+}
+
+function donut(id,labels,values,colors){
+  var el=document.getElementById(id); if(!el)return;
+  var dpr=window.devicePixelRatio||1;
+  var W=el.parentElement.clientWidth||400;
+  var H=parseInt(el.getAttribute('height'))||260;
+  el.width=W*dpr; el.height=H*dpr;
+  el.style.width=W+'px'; el.style.height=H+'px';
+  var ctx=el.getContext('2d'); ctx.scale(dpr,dpr);
+  var lW=170, cA=W-lW;
+  var cx=cA/2, cy=H/2, r=Math.min(cx,cy)*0.84, inner=r*0.58;
+  var total=values.reduce(function(a,b){return a+b;},0);
+  var ang=-Math.PI/2;
+  values.forEach(function(v,i){
+    var sl=v/total*Math.PI*2;
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,ang,ang+sl); ctx.closePath();
+    ctx.fillStyle=colors[i]; ctx.fill(); ang+=sl;
+  });
+  ctx.beginPath(); ctx.arc(cx,cy,inner,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill();
+  // legend
+  var ly=Math.max(10,H/2-labels.length*11);
+  labels.forEach(function(lbl,i){
+    ctx.fillStyle=colors[i]; ctx.fillRect(cA+10,ly,12,12);
+    ctx.fillStyle='#444'; ctx.font='11px "Segoe UI",Arial,sans-serif'; ctx.textAlign='left';
+    ctx.fillText(lbl,cA+28,ly+10); ly+=22;
+  });
+}
+
+window.addEventListener('load',function(){
+  var s25=srt(S,'o25'), top6=s25.slice(0,6);
+
+  // c1 grouped bar
+  chart('c1',top6.map(function(s){return s.n;}),
+    [{data:top6.map(function(s){return s.o24;}),colors:top6.map(function(){return '#B2EBF2';})},
+     {data:top6.map(function(s){return s.o25;}),colors:top6.map(function(s){return s.c;})}],
+    {pB:80});
+
+  // c2 donut
+  donut('c2',top6.map(function(s){return s.n;}),top6.map(function(s){return s.j;}),top6.map(function(s){return s.c;}));
+
+  // c3 flow
+  chart('c3',['Total Output','Reg. Exports','Value Added','Local Sales','Wages','Reg. Imports'],
+    [{data:[610.0,249.5,294.8,136.2,115.2,179.0],colors:['#00BCD4','#00897B','#1B5E20','#6A1B9A','#F57F17','#78909C']}],
+    {pB:55});
+
+  // c4 delta vertical bar
+  var da=srt(S.map(function(s){return {n:s.n,d:parseFloat((s.o25-s.o24).toFixed(2)),c:s.c};}),'d');
+  chart('c4',da.map(function(d){return d.n;}),[{data:da.map(function(d){return d.d;}),colors:da.map(function(d){return d.c;})}],
+    {fmtY:function(v){return '$'+v.toFixed(1)+'M';},pB:110});
+
+  // c5 avg wage vertical bar
+  var wa=srt(S.filter(function(s){return s.j>0;}).map(function(s){return {n:s.n,w:parseFloat((s.w25/s.j*1000).toFixed(1)),c:s.c};}),'w');
+  chart('c5',wa.map(function(d){return d.n;}),[{data:wa.map(function(d){return d.w;}),colors:wa.map(function(d){return d.c;})}],
+    {fmtY:function(v){return '$'+Math.round(v)+'K';},pB:110});
+
+  // bar charts
+  bars('b1',s25,'o25','c','$M');
+  bars('b2',srt(S,'va25'),'va25','c','$M');
+  var rd=srt(S.map(function(s){var r=Math.round(s.va25/s.o25*100);return {n:s.n,r:r,c:r>=70?'#00BCD4':r>=50?'#F57F17':'#78909C'};}),'r');
+  var rh=''; rd.forEach(function(d){rh+='<div class="br"><div class="bl">'+d.n+'</div><div class="bt"><div class="bf" style="width:'+d.r+'%;background:'+d.c+';"></div></div><div class="bv">'+d.r+'%</div></div>';});
+  document.getElementById('b3').innerHTML=rh;
+  bars('b4',srt(S,'j'),'j','c','jobs');
+  bars('b5',srt(S,'ex25').slice(0,10),'ex25','c','$M');
+  bars('b6',srt(S,'im25').slice(0,10),'im25','c','$M');
+
+  // tables
+  var th='';
+  s25.forEach(function(s){var d=s.o25-s.o24,p=((d/s.o24)*100).toFixed(1),cls=d>=0?'cu':'cd',sg=d>=0?'+':'';
+    th+='<tr><td>'+s.n+'</td><td>$'+s.o24.toFixed(1)+'M</td><td>$'+s.o25.toFixed(1)+'M</td><td class="'+cls+'">'+sg+'$'+Math.abs(d).toFixed(1)+'M ('+sg+p+'%)</td><td>'+s.j+'</td><td>$'+s.va24.toFixed(1)+'M</td><td>$'+s.va25.toFixed(1)+'M</td></tr>';});
+  th+='<tr class="tot"><td>Total</td><td>$574.6M</td><td>$610.0M</td><td>+$35.4M (+6.2%)</td><td>1,639</td><td>$277.7M</td><td>$294.8M</td></tr>';
+  document.getElementById('tb1').innerHTML=th;
+
+  var fh='';
+  s25.forEach(function(s){fh+='<tr><td>'+s.n+'</td><td>$'+s.o25.toFixed(1)+'M</td><td>'+s.j+'</td><td>$'+s.w25.toFixed(2)+'M</td><td>$'+s.ls25.toFixed(1)+'M</td><td>$'+s.ex25.toFixed(1)+'M</td><td>$'+s.im25.toFixed(1)+'M</td><td>$'+s.va25.toFixed(1)+'M</td></tr>';});
+  fh+='<tr class="tot"><td>Total</td><td>$610.0M</td><td>1,639</td><td>$115.2M</td><td>$136.2M</td><td>$249.5M</td><td>$179.0M</td><td>$294.8M</td></tr>';
+  document.getElementById('tb2').innerHTML=fh;
+});
+</script>
+</body>
+</html>
