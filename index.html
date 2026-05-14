@@ -23,6 +23,11 @@ body { font-family: 'Segoe UI',Arial,sans-serif; background: var(--grey-light); 
 .header-meta { background: var(--cyan); padding: 14px 24px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; }
 .header-meta .rel { font-size: 10px; font-weight: 700; color: var(--black); text-transform: uppercase; letter-spacing: 0.1em; }
 .header-meta .dt { font-size: 13px; font-weight: 600; color: var(--black); }
+.intro-banner { display: flex; align-items: flex-start; gap: 16px; background: var(--white); border-left: 5px solid var(--cyan); padding: 18px 20px; margin-bottom: 20px; }
+.intro-icon { width: 36px; height: 36px; background: var(--cyan-light); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.intro-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cyan-dark); margin-bottom: 6px; font-family: 'Segoe UI',Arial,sans-serif; }
+.intro-body { font-size: 13px; color: var(--grey-text); line-height: 1.6; font-family: 'Segoe UI',Arial,sans-serif; }
+.intro-body strong { color: var(--black); font-weight: 700; }
 .nav-wrap { background: var(--white); border-bottom: 3px solid var(--cyan); }
 .nav-tabs { max-width: 1200px; margin: 0 auto; display: flex; padding: 0 24px; overflow-x: auto; }
 .nav-tab { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; padding: 14px 18px; cursor: pointer; border: none; background: none; color: var(--grey-text); border-bottom: 3px solid transparent; margin-bottom: -3px; white-space: nowrap; font-family: 'Segoe UI',Arial,sans-serif; }
@@ -119,6 +124,15 @@ tr.tot td:first-child { background: var(--cyan-dark); }
 <div class="page-wrap">
 
 <div id="overview" class="panel active">
+  <div class="intro-banner">
+    <div class="intro-icon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="#00BCD4"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+    </div>
+    <div class="intro-text">
+      <div class="intro-title">About this dashboard</div>
+      <div class="intro-body">This economic dashboard was built by the <strong>District Council of Yankalilla</strong> using <strong>Claude AI</strong> (Anthropic) and data downloaded from <strong>REMPLAN Economy</strong> — Australia's leading regional economic modelling platform. It presents industry output, employment, wages, trade flows and gross regional product for the Yankalilla LGA across two data releases (2024 Release 2 and 2025 Release 1), enabling year-on-year comparison and strategic insight for council and economic development planning. Part of the <strong>Do Business Fleurieu Coast</strong> economic development program.</div>
+    </div>
+  </div>
   <div class="sec-label">Yankalilla LGA — Economic Snapshot · 2025 Release 1</div>
   <div class="metric-row">
     <div class="mc"><div class="lbl">Total Output</div><div class="val">$610M</div><div class="sub up">▲ +6.2% vs 2024</div></div>
